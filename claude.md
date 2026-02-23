@@ -141,21 +141,43 @@ npm run build    # TypeScript check + production build
 npm run preview  # Preview production build
 ```
 
-## Deployment Checklist
+## Deployment Status
 
-1. Deploy to Vercel (connect GitHub repo)
-2. Add all environment variables in Vercel dashboard
-3. Run `003_coupon_increment_function.sql` migration in Supabase
-4. Set up Stripe webhook endpoint: `https://studiozerosf.com/api/webhooks/stripe`
-5. Add Resend domain verification for `studiozerosf.com`
-6. Point Cloudflare DNS to Vercel
+| Step | Status |
+|------|--------|
+| Deploy to Vercel | Done |
+| Environment variables in Vercel | Done |
+| Supabase migration (coupon function) | Done |
+| Stripe webhook endpoint | Done |
+| Email service setup | **IN PROGRESS** - Switched to SendGrid (Resend only allows 1 domain) |
+| Cloudflare DNS to Vercel | Not started |
 
-## Next Steps (Phase 2)
+## Resume Here (Next Session)
+
+**Email setup (SendGrid) - in progress:**
+1. Add SendGrid DNS records to Cloudflare (CNAME/TXT records for domain verification)
+2. Verify domain in SendGrid dashboard
+3. Create SendGrid API key
+4. Update code to use SendGrid instead of Resend
+5. Add `SENDGRID_API_KEY` to Vercel environment variables
+
+**Then:**
+6. Point Cloudflare DNS to Vercel (`CNAME @ → cname.vercel-dns.com`)
+7. Add `studiozerosf.com` domain in Vercel project settings
+8. Test full booking flow
+
+## Next Steps (After Launch)
 
 1. Admin dashboard (calendar management, bookings list, settings)
 2. Guest authentication (magic links for viewing/managing bookings)
 3. Check-in instructions email (auto-send 24h before arrival)
 4. iCal export for calendar sync
+
+## Notes
+
+- Owner approval emails go to: `dylan@dylandibona.com`
+- Using SendGrid instead of Resend (Resend free tier only allows 1 domain, already used for mondayandpartners.com)
+- Vercel preview URL available for testing before DNS cutover
 
 ## Code Conventions
 
