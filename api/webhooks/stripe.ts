@@ -166,7 +166,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   // 5. Send emails
   const appUrl = process.env.VITE_APP_URL || 'https://studiozerosf.com';
-  const ownerEmail = process.env.OWNER_EMAIL || 'hello@studiozerosf.com';
+  const ownerEmail = process.env.OWNER_EMAIL || 'dylan@dylandibona.com';
 
   // Owner approval email
   await sendOwnerApprovalEmail({
