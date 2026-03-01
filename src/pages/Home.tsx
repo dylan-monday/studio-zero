@@ -36,21 +36,23 @@ export function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/80" />
         </div>
         <Container className="relative h-full flex flex-col justify-end pb-16">
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/70 mb-4">
-            San Francisco
-          </p>
-          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-white mb-4 tracking-tight">
-            Studio Zero
-          </h1>
-          <p className="text-lg text-white/80 max-w-md mb-10 leading-relaxed">
-            A thoughtfully designed studio in the heart of the city.
-            Your home base for exploring San Francisco.
-          </p>
-          <Link to="/book">
-            <Button size="lg" className="w-full sm:w-auto bg-white text-text-primary hover:bg-white/90">
-              Check Availability
-            </Button>
-          </Link>
+          <div className="max-w-lg">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/70 mb-4 drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
+              San Francisco
+            </p>
+            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-white mb-4 tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+              Studio Zero
+            </h1>
+            <p className="text-lg text-white/90 max-w-md mb-10 leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
+              A thoughtfully designed studio in the heart of the city.
+              Your home base for exploring San Francisco.
+            </p>
+            <Link to="/book">
+              <Button size="lg" className="w-full sm:w-auto bg-white text-text-primary hover:bg-white/90 shadow-lg">
+                Check Availability
+              </Button>
+            </Link>
+          </div>
         </Container>
       </section>
 
