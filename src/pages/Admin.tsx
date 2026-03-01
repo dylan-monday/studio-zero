@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { format, parseISO } from 'date-fns';
@@ -114,7 +115,7 @@ export function Admin() {
                   </thead>
                   <tbody>
                     {filtered.map((booking) => (
-                      <tr key={booking.id} className="border-b border-border last:border-0 hover:bg-surface/50 transition-colors">
+                      <tr key={booking.id} className="border-b border-border last:border-0 hover:bg-surface/50 transition-colors cursor-pointer" onClick={() => window.location.href = `/admin/booking/${booking.id}`}>
                         <td className="px-4 py-4">
                           <p className="text-sm font-medium text-text-primary">
                             {booking.guest ? `${booking.guest.first_name} ${booking.guest.last_name}` : 'Unknown'}
@@ -156,7 +157,7 @@ export function Admin() {
               {/* Mobile cards */}
               <div className="md:hidden space-y-3">
                 {filtered.map((booking) => (
-                  <div key={booking.id} className="border border-border p-4">
+                  <Link key={booking.id} to={`/admin/booking/${booking.id}`} className="block border border-border p-4 hover:bg-surface/50 transition-colors">
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <p className="text-sm font-medium text-text-primary">
@@ -192,7 +193,7 @@ export function Admin() {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </>

@@ -4,6 +4,7 @@ import { Book } from './pages/Book'
 import { BookingSuccess } from './pages/BookingSuccess'
 import { AdminResult } from './pages/AdminResult'
 import { Admin } from './pages/Admin'
+import { AdminBooking } from './pages/AdminBooking'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/book" element={<Book />} />
       <Route path="/book/success" element={<BookingSuccess />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/admin/booking/:id" element={<AdminBooking />} />
       <Route path="/admin/result" element={<AdminResult />} />
     </Routes>
   )
