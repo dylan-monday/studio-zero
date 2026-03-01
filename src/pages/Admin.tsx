@@ -65,9 +65,13 @@ export function Admin() {
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
               Admin
             </p>
-            <h1 className="font-serif text-3xl md:text-4xl text-text-primary tracking-tight">
+            <h1 className="font-serif text-3xl md:text-4xl text-text-primary tracking-tight mb-4">
               Bookings
             </h1>
+            <div className="flex gap-4">
+              <span className="text-sm font-medium text-text-primary border-b-2 border-text-primary pb-1">Bookings</span>
+              <Link to="/admin/coupons" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Coupons</Link>
+            </div>
           </div>
 
           {/* Filters */}
