@@ -70,7 +70,13 @@ export function AdminBooking() {
 
       const updated = await res.json();
       setBooking(updated);
-      setMessage({ type: 'success', text: `Booking ${action === 'approve' ? 'approved' : action === 'cancel' ? 'cancelled' : 'completed'} successfully.` });
+      setNotes(updated.admin_notes || '');
+      const actionLabel = action === 'approve' ? 'approved' : action === 'cancel' ? 'cancelled' : 'completed';
+      const warningText = updated.warning ? ` ${updated.warning}` : '';
+      setMessage({
+        type: updated.warning ? 'error' : 'success',
+        text: `Booking ${actionLabel} successfully.${warningText}`,
+      });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message || 'Something went wrong' });
     }

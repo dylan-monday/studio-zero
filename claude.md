@@ -2,33 +2,46 @@
 
 ## Project Overview
 
-Studio Zero SF is a custom direct-booking platform for a single studio apartment in San Francisco. It replaces Lodgify with a lean, purpose-built solution featuring Stripe payments, owner approval workflows, and automated guest communications.
+Studio Zero SF is a custom direct-booking platform for a single studio apartment in San Francisco. It replaces Lodgify with a lean, purpose-built solution featuring Stripe payments (authorization hold), owner approval workflows, and automated guest communications via SendGrid.
 
 **Domain:** studiozerosf.com
 **Owner:** Dylan
-**Tech Stack:** React 19 + Vite + TypeScript + Tailwind CSS v4 + Supabase + Stripe
+**Tech Stack:** React 19 + Vite + TypeScript + Tailwind CSS v4 + Supabase + Stripe + SendGrid
 
-## Current State (Phase 1 - Complete)
+## Current State
 
-### Completed
+### Phase 1 - Complete
 - Project scaffolding with Vite + React 19 + TypeScript
-- Tailwind CSS v4 with custom design system
+- Tailwind CSS v4 with elevated design system (DM Serif Display, DM Sans, JetBrains Mono)
 - Supabase schema with 8 tables + RLS policies
-- Landing page with hero, gallery, amenities, house rules, calendar
+- Landing page with hero (SF skyline), gallery, amenities, house rules, calendar
 - Booking flow UI (3-step: dates, details, review)
 - Pricing calculation engine with rule priorities
 - Availability helper combining blocked_dates + bookings
 - Local property photos in `public/photos/`
-- Stripe Checkout integration (redirect to hosted checkout)
-- Stripe webhook handler for payment processing
-- Email templates with Resend (guest pending, guest confirmed, guest declined, owner approval)
-- Owner approval workflow (approve/decline via email links with auto-refund)
-- Success page after booking
+- Stripe Checkout with **authorization hold** (`capture_method: 'manual'`)
+- Stripe webhook handler (creates booking, sends emails via SendGrid)
+- Owner approval workflow (approve captures payment, decline releases hold)
+- SendGrid email templates (guest pending, guest confirmed, guest declined, owner approval)
+- Success page after booking (reflects auth hold messaging)
 - Admin result page for approval feedback
+- Admin bookings list page at `/admin` (via service role API)
+- Vercel SPA routing (vercel.json)
+- Cloudflare email routing: info@studiozerosf.com → dylan@dylandibona.com
+- SendGrid domain authentication verified for studiozerosf.com
+- Copy deck (COPY-DECK.md) for Dylan to review/edit all site copy
 
-### Phase 2 (Not Yet Built)
-- Admin dashboard (calendar management, bookings list, settings)
+### Phase 2 - In Progress
+- **Admin booking detail view** — click into reservations to update/cancel/email guests
+- **Admin coupon management** — CRUD for discount codes
+- **Admin date blocking** — block dates, set rates
+- **House rules page** — waiting on content from Dylan (see COPY-DECK.md)
+
+### Phase 2 - Not Yet Built
 - Guest authentication (magic links for viewing/managing bookings)
+- Check-in instructions email (auto-send 24h before arrival)
+- iCal export for calendar sync
+- Admin email copy management (lockbox codes, etc.)
 
 ## Key Files
 
@@ -36,14 +49,16 @@ Studio Zero SF is a custom direct-booking platform for a single studio apartment
 - `src/App.tsx` - Router with all routes
 - `src/pages/Home.tsx` - Landing page
 - `src/pages/Book.tsx` - 3-step booking flow with Stripe integration
-- `src/pages/BookingSuccess.tsx` - Post-payment success page
+- `src/pages/BookingSuccess.tsx` - Post-payment success page (auth hold messaging)
 - `src/pages/AdminResult.tsx` - Owner approval feedback page
+- `src/pages/Admin.tsx` - Admin bookings list with filters
 
 ### API Routes (Vercel Serverless)
-- `api/create-checkout-session.ts` - Creates Stripe Checkout session
-- `api/webhooks/stripe.ts` - Handles Stripe webhooks (creates booking, sends emails)
+- `api/create-checkout-session.ts` - Creates Stripe Checkout session (capture_method: manual)
+- `api/webhooks/stripe.ts` - Handles Stripe webhooks (creates booking with amount_paid: 0, sends emails)
 - `api/booking/details.ts` - Fetches booking details from session ID
-- `api/booking/approve.ts` - Owner approve/decline handler (with auto-refund)
+- `api/booking/approve.ts` - Owner approve (captures payment) / decline (cancels hold)
+- `api/admin/bookings.ts` - Admin endpoint using service role key (bypasses RLS)
 
 ### Pricing & Availability
 - `src/lib/pricing.ts` - Price calculation with rule priorities
@@ -65,18 +80,35 @@ Studio Zero SF is a custom direct-booking platform for a single studio apartment
 ### Types
 - `src/types/index.ts` - All TypeScript interfaces
 
+### Content
+- `COPY-DECK.md` - Complete copy deck for all user-facing text (for Dylan to edit)
+- `vercel.json` - SPA routing rewrites
+
+## Payment Flow
+
+1. Guest selects dates → Stripe Checkout with `capture_method: 'manual'`
+2. Card is **authorized** (not charged) → webhook creates booking with `amount_paid: 0`
+3. Guest gets "card authorized" email, owner gets approval request email
+4. Owner clicks **Approve** → `paymentIntents.capture()` → `amount_paid` updated → guest gets confirmation email
+5. Owner clicks **Decline** → `paymentIntents.cancel()` → hold released → guest gets decline email
+
 ## Design System
 
 **Colors** (CSS variables in `src/index.css`):
-- Background: `#ffffff`
-- Surface: `#fafafa`
-- Border: `#e5e5e5`
-- Text Primary: `#1a1a1a`
-- Text Secondary: `#6b7280`
-- Accent: `#2563eb` (blue-600)
+- Background: `#faf9f7` (warm off-white)
+- Surface: `#f5f4f0`
+- Border: `#e2dfd9`
+- Text Primary: `#1c1917` (warm black)
+- Text Secondary: `#78716c` (warm gray)
+- Accent: `#1c1917` (text-primary used as accent)
 - Success/Warning/Error: emerald-600/amber-600/red-600
 
-**Typography:** Inter font, semibold headings, 16px body
+**Typography:**
+- Headings: DM Serif Display (serif)
+- Body: DM Sans
+- Labels/Mono: JetBrains Mono (uppercase tracking)
+- Pattern: `font-mono text-xs uppercase tracking-[0.2em]` for section labels
+- Pattern: `font-serif text-3xl md:text-4xl tracking-tight` for page headings
 
 **Patterns:**
 - Mobile-first responsive design
@@ -89,7 +121,7 @@ Studio Zero SF is a custom direct-booking platform for a single studio apartment
 | Table | Purpose |
 |-------|---------|
 | `guests` | Guest profiles with contact info |
-| `bookings` | Reservations with status workflow |
+| `bookings` | Reservations with status workflow (pending → approved → confirmed → completed) |
 | `blocked_dates` | Owner blocks, maintenance |
 | `pricing_rules` | Base/weekend/seasonal rates |
 | `date_overrides` | Single-date price overrides |
@@ -99,6 +131,8 @@ Studio Zero SF is a custom direct-booking platform for a single studio apartment
 | `email_log` | Email tracking |
 
 **Pricing Priority:** date_override (100) > seasonal (50) > weekend/weekday (10) > base (0)
+
+**Booking Status Flow:** pending → approved → confirmed → completed (or cancelled at any point)
 
 ## Property Settings
 
@@ -125,12 +159,12 @@ STRIPE_SECRET_KEY=<stripe-secret>
 STRIPE_WEBHOOK_SECRET=<webhook-secret>
 VITE_STRIPE_PUBLISHABLE_KEY=<publishable-key>
 
-# Resend (email)
-RESEND_API_KEY=<resend-key>
+# SendGrid (email)
+SENDGRID_API_KEY=<sendgrid-key>
 
 # App config
-VITE_APP_URL=https://studiozerosf.com  # or http://localhost:5173 for dev
-OWNER_EMAIL=hello@studiozerosf.com     # Where owner approval emails are sent
+VITE_APP_URL=https://studiozerosf.com
+OWNER_EMAIL=info@studiozerosf.com
 ```
 
 ## Commands
@@ -141,43 +175,23 @@ npm run build    # TypeScript check + production build
 npm run preview  # Preview production build
 ```
 
-## Deployment Status
+## Deployment
 
-| Step | Status |
-|------|--------|
-| Deploy to Vercel | Done |
-| Environment variables in Vercel | Done |
-| Supabase migration (coupon function) | Done |
-| Stripe webhook endpoint | Done |
-| Email service setup | **IN PROGRESS** - Switched to SendGrid (Resend only allows 1 domain) |
-| Cloudflare DNS to Vercel | Not started |
+- **Hosting:** Vercel
+- **Database:** Supabase
+- **Payments:** Stripe (currently in test mode — switch to live for launch)
+- **Email:** SendGrid (trial account — switch to free tier before April 24, 2026)
+- **DNS:** Cloudflare
+- **Domain:** studiozerosf.com
+- **Email routing:** Cloudflare (info@studiozerosf.com → dylan@dylandibona.com)
+- **SendGrid domain:** Verified (em5381.studiozerosf.com)
 
-## Resume Here (Next Session)
+## Admin Notes
 
-**Email setup (SendGrid) - in progress:**
-1. Add SendGrid DNS records to Cloudflare (CNAME/TXT records for domain verification)
-2. Verify domain in SendGrid dashboard
-3. Create SendGrid API key
-4. Update code to use SendGrid instead of Resend
-5. Add `SENDGRID_API_KEY` to Vercel environment variables
-
-**Then:**
-6. Point Cloudflare DNS to Vercel (`CNAME @ → cname.vercel-dns.com`)
-7. Add `studiozerosf.com` domain in Vercel project settings
-8. Test full booking flow
-
-## Next Steps (After Launch)
-
-1. Admin dashboard (calendar management, bookings list, settings)
-2. Guest authentication (magic links for viewing/managing bookings)
-3. Check-in instructions email (auto-send 24h before arrival)
-4. iCal export for calendar sync
-
-## Notes
-
-- Owner approval emails go to: `dylan@dylandibona.com`
-- Using SendGrid instead of Resend (Resend free tier only allows 1 domain, already used for mondayandpartners.com)
-- Vercel preview URL available for testing before DNS cutover
+- Admin page at `/admin` is not linked in navigation (access directly)
+- Admin API endpoint (`/api/admin/bookings`) uses service role key to bypass Supabase RLS
+- No admin authentication yet — page is accessible but unlisted
+- RLS policies block frontend Supabase client from reading bookings — all admin reads go through API
 
 ## Code Conventions
 
@@ -187,3 +201,5 @@ npm run preview  # Preview production build
 - Format dates as `yyyy-MM-dd` for DB storage
 - All pricing in dollars (not cents) until Stripe
 - TypeScript strict mode enabled
+- Email from address: `info@studiozerosf.com` with name `Studio Zero SF`
+- Owner approval emails go to: value of `OWNER_EMAIL` env var (info@studiozerosf.com)

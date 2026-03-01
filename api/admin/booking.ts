@@ -88,6 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // Cancel or refund based on payment state
+      let paymentNote = '';
       if (booking.stripe_payment_intent) {
         try {
           const pi = await stripe.paymentIntents.retrieve(booking.stripe_payment_intent);
@@ -100,13 +101,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         } catch (err) {
           console.error('Payment cancel/refund failed:', err);
-          return res.status(500).json({ error: 'Failed to process payment cancellation' });
+          paymentNote = 'Note: Could not process refund via Stripe (payment intent may be from test mode or expired). Booking cancelled without refund.';
         }
+      }
+
+      const cancelUpdate: Record<string, unknown> = { status: 'cancelled', amount_paid: 0, approval_token: null };
+      if (paymentNote) {
+        const existingNotes = booking.admin_notes || '';
+        cancelUpdate.admin_notes = existingNotes ? `${existingNotes}\n\n${paymentNote}` : paymentNote;
       }
 
       await supabase
         .from('bookings')
-        .update({ status: 'cancelled', amount_paid: 0, approval_token: null })
+        .update(cancelUpdate)
         .eq('id', id);
 
       // Send decline email
@@ -116,7 +123,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const { data: updated } = await supabase.from('bookings').select(`*, guest:guests(*)`).eq('id', id).single();
-      return res.status(200).json(updated);
+      return res.status(200).json({ ...updated, warning: paymentNote || undefined });
     }
 
     if (action === 'complete') {
