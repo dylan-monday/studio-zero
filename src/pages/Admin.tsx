@@ -71,6 +71,7 @@ export function Admin() {
             <div className="flex gap-4">
               <span className="text-sm font-medium text-text-primary border-b-2 border-text-primary pb-1">Bookings</span>
               <Link to="/admin/coupons" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Coupons</Link>
+              <Link to="/admin/calendar" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Calendar</Link>
             </div>
           </div>
 
