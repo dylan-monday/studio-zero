@@ -180,7 +180,8 @@ async function sendGuestConfirmationEmail(params: GuestConfirmationParams) {
 
   try {
     await sgMail.send({
-      from: { email: 'bookings@studiozerosf.com', name: 'Studio Zero SF' },
+      from: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
+      replyTo: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
       subject: 'Your Booking is Confirmed! - Studio Zero SF',
       html: `
@@ -261,7 +262,8 @@ async function sendGuestDeclineEmail(params: GuestDeclineParams) {
 
   try {
     await sgMail.send({
-      from: { email: 'bookings@studiozerosf.com', name: 'Studio Zero SF' },
+      from: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
+      replyTo: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
       subject: 'Booking Update - Studio Zero SF',
       html: `

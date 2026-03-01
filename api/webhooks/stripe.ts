@@ -226,7 +226,8 @@ async function sendOwnerApprovalEmail(params: OwnerEmailParams) {
 
   try {
     await sgMail.send({
-      from: { email: 'bookings@studiozerosf.com', name: 'Studio Zero SF' },
+      from: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
+      replyTo: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       to: ownerEmail,
       subject: `New Booking Request - ${guestName}`,
       html: `
@@ -302,7 +303,8 @@ async function sendGuestPendingEmail(params: GuestEmailParams) {
 
   try {
     await sgMail.send({
-      from: { email: 'bookings@studiozerosf.com', name: 'Studio Zero SF' },
+      from: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
+      replyTo: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
       subject: 'Your Booking Request - Studio Zero SF',
       html: `
