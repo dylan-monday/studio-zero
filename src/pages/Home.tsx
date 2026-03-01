@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { PhotoGallery } from '../components/gallery/PhotoGallery';
 import { AvailabilityCalendar } from '../components/booking/AvailabilityCalendar';
+import { format } from 'date-fns';
 
 const HERO_IMAGE = '/photos/sf-skyline.jpg';
 
@@ -16,6 +17,12 @@ const GALLERY_PHOTOS = [
 ];
 
 export function Home() {
+  const navigate = useNavigate();
+
+  function handleDateSelect(date: Date) {
+    navigate(`/book?checkin=${format(date, 'yyyy-MM-dd')}`);
+  }
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -229,7 +236,7 @@ export function Home() {
             <p className="text-text-secondary text-center mb-10">
               Select your dates to see pricing
             </p>
-            <AvailabilityCalendar />
+            <AvailabilityCalendar onDateSelect={handleDateSelect} />
             <div className="mt-10 text-center">
               <Link to="/book">
                 <Button size="lg" className="w-full sm:w-auto">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { format, differenceInDays } from 'date-fns';
+import { format, differenceInDays, parseISO } from 'date-fns';
 import { useSearchParams } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { Layout } from '../components/layout/Layout';
@@ -26,14 +26,21 @@ type BookingStep = 'dates' | 'details' | 'review';
 export function Book() {
   const [searchParams] = useSearchParams();
   const wasCancelled = searchParams.get('cancelled') === 'true';
+  const checkinParam = searchParams.get('checkin');
 
   // Step state
   const [step, setStep] = useState<BookingStep>('dates');
 
-  // Date selection
-  const [checkIn, setCheckIn] = useState<Date | undefined>();
+  // Date selection — pre-select check-in from query param if provided
+  const [checkIn, setCheckIn] = useState<Date | undefined>(() => {
+    if (checkinParam) {
+      const d = parseISO(checkinParam);
+      return isNaN(d.getTime()) ? undefined : d;
+    }
+    return undefined;
+  });
   const [checkOut, setCheckOut] = useState<Date | undefined>();
-  const [selectingCheckOut, setSelectingCheckOut] = useState(false);
+  const [selectingCheckOut, setSelectingCheckOut] = useState(() => !!checkinParam);
 
   // Guest count
   const [guestCount, setGuestCount] = useState(1);
