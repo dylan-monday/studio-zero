@@ -327,7 +327,7 @@ export function AdminBooking() {
 
           {/* Actions */}
           {(canApprove || canCancel || canComplete) && (
-            <div className="border border-border p-6">
+            <div className="border border-border p-6 mb-6">
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-4">
                 Actions
               </p>
@@ -360,6 +360,43 @@ export function AdminBooking() {
                   </Button>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Send Check-in Email */}
+          {booking.status === 'confirmed' && (
+            <div className="border border-border p-6">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-4">
+                Communications
+              </p>
+              <p className="text-sm text-text-secondary mb-3">
+                Send check-in instructions with address, entry codes, WiFi, and checkout details.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  if (!window.confirm(`Send check-in instructions to ${guest?.email}?`)) return;
+                  setActionLoading('checkin');
+                  setMessage(null);
+                  try {
+                    const res = await adminFetch('/api/admin/emails', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ action: 'send_checkin', bookingId: booking.id }),
+                    });
+                    if (!res.ok) throw new Error('Failed to send');
+                    const data = await res.json();
+                    setMessage({ type: 'success', text: `Check-in email sent to ${data.sent_to}` });
+                  } catch {
+                    setMessage({ type: 'error', text: 'Failed to send check-in email' });
+                  }
+                  setActionLoading(null);
+                }}
+                isLoading={actionLoading === 'checkin'}
+              >
+                Send Check-in Email
+              </Button>
             </div>
           )}
         </Container>

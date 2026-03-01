@@ -186,6 +186,7 @@ export function AdminCalendar() {
               <Link to="/admin" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Bookings</Link>
               <Link to="/admin/coupons" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Coupons</Link>
               <span className="text-sm font-medium text-text-primary border-b-2 border-text-primary pb-1">Calendar</span>
+              <Link to="/admin/emails" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Emails</Link>
               <span className="flex-1" />
               <button onClick={logout} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Sign Out</button>
             </div>
