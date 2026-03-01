@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import sgMail from '@sendgrid/mail';
+import { requireAdmin } from '../lib/admin-auth';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
@@ -15,6 +16,8 @@ const supabase = createClient(
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!requireAdmin(req, res)) return;
+
   const { id } = req.query;
 
   if (!id || typeof id !== 'string') {

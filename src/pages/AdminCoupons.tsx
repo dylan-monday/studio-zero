@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
+import { adminFetch } from '../lib/adminFetch';
 import type { Coupon } from '../types';
+import type { AdminAuthContext } from '../components/admin/AdminAuth';
 
 interface CouponFormData {
   code: string;
@@ -28,6 +30,7 @@ const emptyForm: CouponFormData = {
 };
 
 export function AdminCoupons() {
+  const { logout } = useOutletContext<AdminAuthContext>();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -42,7 +45,7 @@ export function AdminCoupons() {
 
   async function fetchCoupons() {
     try {
-      const res = await fetch('/api/admin/coupons');
+      const res = await adminFetch('/api/admin/coupons');
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       setCoupons(data);
@@ -100,13 +103,13 @@ export function AdminCoupons() {
     try {
       let res: Response;
       if (editingId) {
-        res = await fetch('/api/admin/coupons', {
+        res = await adminFetch('/api/admin/coupons', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: editingId, ...payload }),
         });
       } else {
-        res = await fetch('/api/admin/coupons', {
+        res = await adminFetch('/api/admin/coupons', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -131,7 +134,7 @@ export function AdminCoupons() {
     if (!window.confirm(`Delete coupon "${coupon.code}"? This cannot be undone.`)) return;
 
     try {
-      const res = await fetch(`/api/admin/coupons?id=${coupon.id}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/admin/coupons?id=${coupon.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       setMessage({ type: 'success', text: 'Coupon deleted.' });
       fetchCoupons();
@@ -142,7 +145,7 @@ export function AdminCoupons() {
 
   async function handleToggleActive(coupon: Coupon) {
     try {
-      const res = await fetch('/api/admin/coupons', {
+      const res = await adminFetch('/api/admin/coupons', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: coupon.id, is_active: !coupon.is_active }),
@@ -177,10 +180,12 @@ export function AdminCoupons() {
               <h1 className="font-serif text-3xl md:text-4xl text-text-primary tracking-tight mb-4">
                 Coupon Codes
               </h1>
-              <div className="flex gap-4">
+              <div className="flex gap-4 items-center">
                 <Link to="/admin" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Bookings</Link>
                 <span className="text-sm font-medium text-text-primary border-b-2 border-text-primary pb-1">Coupons</span>
                 <Link to="/admin/calendar" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Calendar</Link>
+                <span className="flex-1" />
+                <button onClick={logout} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Sign Out</button>
               </div>
             </div>
             {!showForm && (

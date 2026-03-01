@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '../lib/admin-auth';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL!,
@@ -7,6 +8,8 @@ const supabase = createClient(
 );
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!requireAdmin(req, res)) return;
+
   const { resource } = req.query;
 
   if (resource === 'blocked-dates') return handleBlockedDates(req, res);

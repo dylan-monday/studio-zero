@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { format, parseISO } from 'date-fns';
+import { adminFetch } from '../lib/adminFetch';
 import type { Booking, BookingStatus } from '../types';
+import type { AdminAuthContext } from '../components/admin/AdminAuth';
 
 type FilterStatus = 'all' | BookingStatus;
 
@@ -24,6 +26,7 @@ const FILTER_OPTIONS: { value: FilterStatus; label: string }[] = [
 ];
 
 export function Admin() {
+  const { logout } = useOutletContext<AdminAuthContext>();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterStatus>('all');
@@ -31,7 +34,7 @@ export function Admin() {
   useEffect(() => {
     async function fetchBookings() {
       try {
-        const res = await fetch('/api/admin/bookings');
+        const res = await adminFetch('/api/admin/bookings');
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setBookings(data);
@@ -68,10 +71,12 @@ export function Admin() {
             <h1 className="font-serif text-3xl md:text-4xl text-text-primary tracking-tight mb-4">
               Bookings
             </h1>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               <span className="text-sm font-medium text-text-primary border-b-2 border-text-primary pb-1">Bookings</span>
               <Link to="/admin/coupons" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Coupons</Link>
               <Link to="/admin/calendar" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Calendar</Link>
+              <span className="flex-1" />
+              <button onClick={logout} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Sign Out</button>
             </div>
           </div>
 

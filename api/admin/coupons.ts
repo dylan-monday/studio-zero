@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '../lib/admin-auth';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL!,
@@ -7,6 +8,7 @@ const supabase = createClient(
 );
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!requireAdmin(req, res)) return;
   // GET — list all coupons
   if (req.method === 'GET') {
     const { data, error } = await supabase

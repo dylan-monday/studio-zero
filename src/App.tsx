@@ -8,6 +8,7 @@ import { AdminBooking } from './pages/AdminBooking'
 import { AdminCoupons } from './pages/AdminCoupons'
 import { AdminCalendar } from './pages/AdminCalendar'
 import { HouseRules } from './pages/HouseRules'
+import { AdminAuth } from './components/admin/AdminAuth'
 
 function App() {
   return (
@@ -16,10 +17,14 @@ function App() {
       <Route path="/book" element={<Book />} />
       <Route path="/house-rules" element={<HouseRules />} />
       <Route path="/book/success" element={<BookingSuccess />} />
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/admin/booking/:id" element={<AdminBooking />} />
-      <Route path="/admin/coupons" element={<AdminCoupons />} />
-      <Route path="/admin/calendar" element={<AdminCalendar />} />
+      {/* Admin routes — protected by auth */}
+      <Route element={<AdminAuth />}>
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/booking/:id" element={<AdminBooking />} />
+        <Route path="/admin/coupons" element={<AdminCoupons />} />
+        <Route path="/admin/calendar" element={<AdminCalendar />} />
+      </Route>
+      {/* Admin result page — accessed from email links, no auth */}
       <Route path="/admin/result" element={<AdminResult />} />
     </Routes>
   )

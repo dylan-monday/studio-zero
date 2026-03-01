@@ -4,6 +4,7 @@ import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { format, parseISO } from 'date-fns';
+import { adminFetch } from '../lib/adminFetch';
 import type { Booking, BookingStatus } from '../types';
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
@@ -26,7 +27,7 @@ export function AdminBooking() {
   useEffect(() => {
     async function fetchBooking() {
       try {
-        const res = await fetch(`/api/admin/booking?id=${id}`);
+        const res = await adminFetch(`/api/admin/booking?id=${id}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setBooking(data);
@@ -57,7 +58,7 @@ export function AdminBooking() {
     setMessage(null);
 
     try {
-      const res = await fetch(`/api/admin/booking?id=${booking.id}`, {
+      const res = await adminFetch(`/api/admin/booking?id=${booking.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action }),
@@ -88,7 +89,7 @@ export function AdminBooking() {
 
     setActionLoading('notes');
     try {
-      const res = await fetch(`/api/admin/booking?id=${booking.id}`, {
+      const res = await adminFetch(`/api/admin/booking?id=${booking.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ admin_notes: notes }),

@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { format, parseISO, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday, isBefore, startOfDay } from 'date-fns';
+import { adminFetch } from '../lib/adminFetch';
 import type { BlockedDate, DateOverride, PricingRule } from '../types';
+import type { AdminAuthContext } from '../components/admin/AdminAuth';
 
 export function AdminCalendar() {
+  const { logout } = useOutletContext<AdminAuthContext>();
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [overrides, setOverrides] = useState<DateOverride[]>([]);
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
@@ -32,9 +35,9 @@ export function AdminCalendar() {
   async function fetchAll() {
     try {
       const [blockedRes, overrideRes, rulesRes] = await Promise.all([
-        fetch('/api/admin/calendar?resource=blocked-dates'),
-        fetch('/api/admin/calendar?resource=date-overrides'),
-        fetch('/api/admin/calendar?resource=pricing-rules'),
+        adminFetch('/api/admin/calendar?resource=blocked-dates'),
+        adminFetch('/api/admin/calendar?resource=date-overrides'),
+        adminFetch('/api/admin/calendar?resource=pricing-rules'),
       ]);
       if (blockedRes.ok) setBlockedDates(await blockedRes.json());
       if (overrideRes.ok) setOverrides(await overrideRes.json());
@@ -59,7 +62,7 @@ export function AdminCalendar() {
     if (selectedDates.size === 0) return;
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/calendar?resource=blocked-dates', {
+      const res = await adminFetch('/api/admin/calendar?resource=blocked-dates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dates: Array.from(selectedDates), reason: 'owner_block' }),
@@ -78,7 +81,7 @@ export function AdminCalendar() {
     if (toUnblock.length === 0) return;
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/calendar?resource=blocked-dates', {
+      const res = await adminFetch('/api/admin/calendar?resource=blocked-dates', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dates: toUnblock }),
@@ -96,7 +99,7 @@ export function AdminCalendar() {
     e.preventDefault();
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/calendar?resource=date-overrides', {
+      const res = await adminFetch('/api/admin/calendar?resource=date-overrides', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: overrideDate, nightly_rate: parseFloat(overrideRate), note: overrideNote || null }),
@@ -116,7 +119,7 @@ export function AdminCalendar() {
   async function deleteOverride(override: DateOverride) {
     if (!window.confirm(`Remove rate override for ${override.date}?`)) return;
     try {
-      const res = await fetch(`/api/admin/calendar?resource=date-overrides&id=${override.id}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/admin/calendar?resource=date-overrides&id=${override.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       fetchAll();
     } catch (err: any) {
@@ -127,7 +130,7 @@ export function AdminCalendar() {
   async function updatePricingRule(id: string) {
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/calendar?resource=pricing-rules', {
+      const res = await adminFetch('/api/admin/calendar?resource=pricing-rules', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, nightly_rate: parseFloat(editRate) }),
@@ -166,10 +169,12 @@ export function AdminCalendar() {
           <div className="mb-8">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">Admin</p>
             <h1 className="font-serif text-3xl md:text-4xl text-text-primary tracking-tight mb-4">Calendar & Rates</h1>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               <Link to="/admin" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Bookings</Link>
               <Link to="/admin/coupons" className="text-sm text-text-secondary hover:text-text-primary transition-colors pb-1">Coupons</Link>
               <span className="text-sm font-medium text-text-primary border-b-2 border-text-primary pb-1">Calendar</span>
+              <span className="flex-1" />
+              <button onClick={logout} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Sign Out</button>
             </div>
           </div>
 
