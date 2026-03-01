@@ -54,6 +54,7 @@ export function AdminEmails() {
   const [activeTab, setActiveTab] = useState<EmailType>('guest_pending');
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -68,6 +69,7 @@ export function AdminEmails() {
       setContent(data);
     } catch (err) {
       console.error('Error fetching email content:', err);
+      setFetchError(true);
     }
     setLoading(false);
   }
@@ -125,12 +127,27 @@ export function AdminEmails() {
     setMessage(null);
   }
 
-  if (loading || !content) {
+  if (loading) {
     return (
       <Layout>
         <section className="py-12 md:py-20">
           <Container size="full">
             <p className="text-text-secondary">Loading email content...</p>
+          </Container>
+        </section>
+      </Layout>
+    );
+  }
+
+  if (fetchError || !content) {
+    return (
+      <Layout>
+        <section className="py-12 md:py-20">
+          <Container size="full">
+            <p className="text-red-600 mb-4">Failed to load email content. The API may not be deployed yet.</p>
+            <Button variant="outline" size="sm" onClick={() => { setFetchError(false); setLoading(true); fetchContent(); }}>
+              Retry
+            </Button>
           </Container>
         </section>
       </Layout>
