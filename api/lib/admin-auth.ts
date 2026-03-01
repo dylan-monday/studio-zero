@@ -1,17 +1,17 @@
-import crypto from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export function generateAdminToken(): string {
   const email = (process.env.ADMIN_EMAIL || '').toLowerCase();
   const password = process.env.ADMIN_PASSWORD || '';
-  return crypto.createHmac('sha256', password).update(email).digest('hex');
+  return createHmac('sha256', password).update(email).digest('hex');
 }
 
 export function verifyAdminToken(token: string | undefined): boolean {
   if (!token) return false;
   const expected = generateAdminToken();
   try {
-    return crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+    return timingSafeEqual(Buffer.from(token), Buffer.from(expected));
   } catch {
     return false;
   }

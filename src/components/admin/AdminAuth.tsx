@@ -30,12 +30,16 @@ export function AdminAuth() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        throw new Error(data.error || 'Login failed');
+        let errorMsg = 'Login failed';
+        try {
+          const data = await res.json();
+          errorMsg = data.error || errorMsg;
+        } catch { /* non-JSON response */ }
+        throw new Error(errorMsg);
       }
 
+      const data = await res.json();
       setAdminToken(data.token);
       setIsAuthenticated(true);
     } catch (err: any) {
