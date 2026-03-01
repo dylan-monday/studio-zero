@@ -145,7 +145,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       discount_amount: discount,
       cleaning_fee: cleaningFee,
       total_amount: total,
-      amount_paid: total,
+      amount_paid: 0, // Authorization hold only — captured on approval
       stripe_checkout_id: session.id,
       stripe_payment_intent: session.payment_intent as string,
       coupon_id: couponId || null,
@@ -229,40 +229,58 @@ async function sendOwnerApprovalEmail(params: OwnerEmailParams) {
       from: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       replyTo: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       to: ownerEmail,
-      subject: `New Booking Request - ${guestName}`,
+      subject: `New Booking Request — ${guestName}`,
       html: `
-        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 24px;">New Booking Request</h1>
-
-          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 24px;">
-            <h2 style="color: #1a1a1a; font-size: 18px; margin: 0 0 16px 0;">Guest Details</h2>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Name:</strong> ${guestName}</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Email:</strong> ${guestEmail}</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Phone:</strong> ${guestPhone}</p>
-            ${guestNotes ? `<p style="margin: 8px 0; color: #4a4a4a;"><strong>Notes:</strong> ${guestNotes}</p>` : ''}
+        <div style="font-family: 'DM Sans', system-ui, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #faf9f7;">
+          <div style="margin-bottom: 32px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 8px 0;">New Request</p>
+            <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #1c1917; margin: 0; letter-spacing: -0.01em;">Booking Request</h1>
           </div>
 
-          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 24px;">
-            <h2 style="color: #1a1a1a; font-size: 18px; margin: 0 0 16px 0;">Booking Details</h2>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Check-in:</strong> ${checkInDate}</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Check-out:</strong> ${checkOutDate}</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Guests:</strong> ${booking.guests_count}</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Total:</strong> $${booking.total_amount.toFixed(2)}</p>
+          <div style="border-top: 1px solid #e2dfd9; padding-top: 24px; margin-bottom: 24px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 12px 0;">Guest</p>
+            <p style="margin: 6px 0; color: #1c1917; font-size: 15px; line-height: 1.6;">${guestName}</p>
+            <p style="margin: 6px 0; color: #78716c; font-size: 14px; line-height: 1.6;">${guestEmail} &middot; ${guestPhone}</p>
+            ${guestNotes ? `<p style="margin: 12px 0 0 0; color: #78716c; font-size: 14px; line-height: 1.6; font-style: italic;">"${guestNotes}"</p>` : ''}
           </div>
 
-          <p style="color: #4a4a4a; margin-bottom: 24px;">Payment has been collected. Please approve or decline this booking.</p>
+          <div style="border-top: 1px solid #e2dfd9; padding-top: 24px; margin-bottom: 24px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 12px 0;">Stay Details</p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Check-in</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${checkInDate}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Check-out</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${checkOutDate}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Guests</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${booking.guests_count}</td>
+              </tr>
+              <tr style="border-top: 1px solid #e2dfd9;">
+                <td style="padding: 12px 0 6px; color: #1c1917; font-size: 15px; font-weight: 500;">Total</td>
+                <td style="padding: 12px 0 6px; color: #1c1917; font-size: 15px; font-weight: 500; text-align: right;">$${booking.total_amount.toFixed(2)}</td>
+              </tr>
+            </table>
+          </div>
 
-          <div style="text-align: center;">
-            <a href="${approveUrl}" style="display: inline-block; background: #16a34a; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin-right: 12px;">
-              Approve Booking
+          <p style="color: #78716c; font-size: 14px; line-height: 1.6; margin-bottom: 28px;">
+            Card has been authorized but not charged. Approving will capture the payment. Declining will release the hold.
+          </p>
+
+          <div style="text-align: center; margin-bottom: 32px;">
+            <a href="${approveUrl}" style="display: inline-block; background: #1c1917; color: #faf9f7; padding: 14px 32px; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.02em; margin-right: 8px;">
+              Approve
             </a>
-            <a href="${declineUrl}" style="display: inline-block; background: #dc2626; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
-              Decline Booking
+            <a href="${declineUrl}" style="display: inline-block; background: transparent; color: #1c1917; padding: 14px 32px; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.02em; border: 1px solid #e2dfd9;">
+              Decline
             </a>
           </div>
 
-          <p style="color: #888; font-size: 12px; margin-top: 32px; text-align: center;">
-            Booking ID: ${booking.id}
+          <p style="font-family: monospace; font-size: 10px; color: #78716c; text-align: center; letter-spacing: 0.1em; margin: 0;">
+            ${booking.id}
           </p>
         </div>
       `,
@@ -306,32 +324,48 @@ async function sendGuestPendingEmail(params: GuestEmailParams) {
       from: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       replyTo: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
-      subject: 'Your Booking Request - Studio Zero SF',
+      subject: 'Booking Request Received — Studio Zero SF',
       html: `
-        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 24px;">Thanks for your booking, ${guestName}!</h1>
-
-          <p style="color: #4a4a4a; line-height: 1.6; margin-bottom: 24px;">
-            We've received your booking request and your payment has been processed.
-            The host will review your request and you'll receive a confirmation email shortly.
-          </p>
-
-          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 24px;">
-            <h2 style="color: #1a1a1a; font-size: 18px; margin: 0 0 16px 0;">Your Stay</h2>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Check-in:</strong> ${checkInDate} at 3:00 PM</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Check-out:</strong> ${checkOutDate} at 11:00 AM</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Guests:</strong> ${booking.guests_count}</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Total Paid:</strong> $${booking.total_amount.toFixed(2)}</p>
+        <div style="font-family: 'DM Sans', system-ui, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #faf9f7;">
+          <div style="margin-bottom: 32px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 8px 0;">Booking Received</p>
+            <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #1c1917; margin: 0; letter-spacing: -0.01em;">Thanks, ${guestName}</h1>
           </div>
 
-          <p style="color: #4a4a4a; line-height: 1.6;">
-            Questions? Reply to this email and we'll get back to you soon.
+          <p style="color: #78716c; font-size: 15px; line-height: 1.65; margin: 0 0 28px 0;">
+            We've received your booking request. Your card has been authorized but won't be charged until the host confirms your stay. You'll hear back shortly.
           </p>
 
-          <p style="color: #888; font-size: 12px; margin-top: 32px;">
-            Studio Zero SF<br>
-            San Francisco, CA
+          <div style="border-top: 1px solid #e2dfd9; padding-top: 24px; margin-bottom: 28px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 12px 0;">Your Stay</p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Check-in</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${checkInDate} at 3:00 PM</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Check-out</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${checkOutDate} at 11:00 AM</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Guests</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${booking.guests_count}</td>
+              </tr>
+              <tr style="border-top: 1px solid #e2dfd9;">
+                <td style="padding: 12px 0 6px; color: #1c1917; font-size: 15px; font-weight: 500;">Total</td>
+                <td style="padding: 12px 0 6px; color: #1c1917; font-size: 15px; font-weight: 500; text-align: right;">$${booking.total_amount.toFixed(2)}</td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="color: #78716c; font-size: 14px; line-height: 1.65;">
+            Questions? Just reply to this email.
           </p>
+
+          <div style="border-top: 1px solid #e2dfd9; margin-top: 32px; padding-top: 20px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0;">Studio Zero SF</p>
+            <p style="font-family: monospace; font-size: 10px; color: #78716c; margin: 4px 0 0 0; letter-spacing: 0.1em;">San Francisco, CA</p>
+          </div>
         </div>
       `,
     });

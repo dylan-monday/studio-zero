@@ -105,6 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         nightlyRates: JSON.stringify(pricing.nights),
       },
       payment_intent_data: {
+        capture_method: 'manual', // Authorize only — capture on owner approval
         metadata: {
           checkIn,
           checkOut,

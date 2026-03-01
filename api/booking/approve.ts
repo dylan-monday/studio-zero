@@ -59,12 +59,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const guest = booking.guest;
 
     if (action === 'approve') {
+      // Capture the authorized payment
+      if (booking.stripe_payment_intent) {
+        try {
+          await stripe.paymentIntents.capture(booking.stripe_payment_intent);
+        } catch (captureError) {
+          console.error('Payment capture failed:', captureError);
+          return redirectWithMessage(
+            res,
+            appUrl,
+            'error',
+            'Failed to capture payment. The authorization may have expired. Please check Stripe dashboard.'
+          );
+        }
+      }
+
       // Approve the booking
       await supabase
         .from('bookings')
         .update({
           status: 'confirmed',
-          approval_token: null, // Invalidate token after use
+          amount_paid: booking.total_amount,
+          approval_token: null,
         })
         .eq('id', booking.id);
 
@@ -88,19 +104,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `Booking approved! ${guest.first_name} ${guest.last_name} has been notified.`
       );
     } else {
-      // Decline the booking - process refund
+      // Cancel the authorization hold (no charge, no refund needed)
       if (booking.stripe_payment_intent) {
         try {
-          await stripe.refunds.create({
-            payment_intent: booking.stripe_payment_intent,
-          });
-        } catch (refundError) {
-          console.error('Refund failed:', refundError);
+          await stripe.paymentIntents.cancel(booking.stripe_payment_intent);
+        } catch (cancelError) {
+          console.error('Payment cancel failed:', cancelError);
           return redirectWithMessage(
             res,
             appUrl,
             'error',
-            'Failed to process refund. Please check Stripe dashboard.'
+            'Failed to cancel payment hold. Please check Stripe dashboard.'
           );
         }
       }
@@ -122,7 +136,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         booking: {
           check_in: booking.check_in,
           check_out: booking.check_out,
-          total_amount: booking.total_amount,
         },
       });
 
@@ -130,7 +143,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res,
         appUrl,
         'success',
-        `Booking declined. ${guest.first_name} ${guest.last_name} has been refunded and notified.`
+        `Booking declined. ${guest.first_name} ${guest.last_name} has been notified.`
       );
     }
   } catch (error) {
@@ -183,48 +196,54 @@ async function sendGuestConfirmationEmail(params: GuestConfirmationParams) {
       from: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       replyTo: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
-      subject: 'Your Booking is Confirmed! - Studio Zero SF',
+      subject: 'Booking Confirmed — Studio Zero SF',
       html: `
-        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="text-align: center; margin-bottom: 24px;">
-            <div style="display: inline-block; background: #dcfce7; padding: 12px; border-radius: 50%;">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
-                <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
+        <div style="font-family: 'DM Sans', system-ui, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #faf9f7;">
+          <div style="margin-bottom: 32px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 8px 0;">Confirmed</p>
+            <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #1c1917; margin: 0; letter-spacing: -0.01em;">You're all set, ${guestName}</h1>
           </div>
 
-          <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 8px; text-align: center;">
-            You're all set, ${guestName}!
-          </h1>
-
-          <p style="color: #4a4a4a; text-align: center; margin-bottom: 24px;">
-            Your booking has been confirmed. We're excited to host you!
+          <p style="color: #78716c; font-size: 15px; line-height: 1.65; margin: 0 0 28px 0;">
+            Your booking has been confirmed and your card has been charged. We're looking forward to hosting you.
           </p>
 
-          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 24px;">
-            <h2 style="color: #1a1a1a; font-size: 18px; margin: 0 0 16px 0;">Booking Details</h2>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Check-in:</strong> ${checkInDate} at 3:00 PM</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Check-out:</strong> ${checkOutDate} at 11:00 AM</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Guests:</strong> ${booking.guests_count}</p>
-            <p style="margin: 8px 0; color: #4a4a4a;"><strong>Total:</strong> $${booking.total_amount.toFixed(2)}</p>
+          <div style="border-top: 1px solid #e2dfd9; padding-top: 24px; margin-bottom: 28px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 12px 0;">Booking Details</p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Check-in</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${checkInDate} at 3:00 PM</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Check-out</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${checkOutDate} at 11:00 AM</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #78716c; font-size: 14px;">Guests</td>
+                <td style="padding: 6px 0; color: #1c1917; font-size: 14px; text-align: right;">${booking.guests_count}</td>
+              </tr>
+              <tr style="border-top: 1px solid #e2dfd9;">
+                <td style="padding: 12px 0 6px; color: #1c1917; font-size: 15px; font-weight: 500;">Total Charged</td>
+                <td style="padding: 12px 0 6px; color: #1c1917; font-size: 15px; font-weight: 500; text-align: right;">$${booking.total_amount.toFixed(2)}</td>
+              </tr>
+            </table>
           </div>
 
-          <div style="background: #eff6ff; padding: 20px; border-radius: 8px; margin-bottom: 24px;">
-            <h2 style="color: #1a1a1a; font-size: 18px; margin: 0 0 16px 0;">What's Next?</h2>
-            <p style="margin: 8px 0; color: #4a4a4a;">
+          <div style="border-top: 1px solid #e2dfd9; padding-top: 24px; margin-bottom: 28px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 12px 0;">What's Next</p>
+            <p style="color: #78716c; font-size: 14px; line-height: 1.65; margin: 0 0 8px 0;">
               You'll receive check-in instructions and access details 24 hours before your arrival.
             </p>
-            <p style="margin: 8px 0; color: #4a4a4a;">
-              Have questions before then? Just reply to this email.
+            <p style="color: #78716c; font-size: 14px; line-height: 1.65; margin: 0;">
+              Questions before then? Just reply to this email.
             </p>
           </div>
 
-          <p style="color: #888; font-size: 12px; margin-top: 32px; text-align: center;">
-            Studio Zero SF<br>
-            San Francisco, CA<br><br>
-            Booking ID: ${booking.id}
-          </p>
+          <div style="border-top: 1px solid #e2dfd9; margin-top: 32px; padding-top: 20px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0;">Studio Zero SF</p>
+            <p style="font-family: monospace; font-size: 10px; color: #78716c; margin: 4px 0 0 0; letter-spacing: 0.1em;">San Francisco, CA &middot; ${booking.id}</p>
+          </div>
         </div>
       `,
     });
@@ -239,7 +258,6 @@ interface GuestDeclineParams {
   booking: {
     check_in: string;
     check_out: string;
-    total_amount: number;
   };
 }
 
@@ -265,37 +283,32 @@ async function sendGuestDeclineEmail(params: GuestDeclineParams) {
       from: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       replyTo: { email: 'info@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
-      subject: 'Booking Update - Studio Zero SF',
+      subject: 'Booking Update — Studio Zero SF',
       html: `
-        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 24px;">
-            Hi ${guestName},
-          </h1>
-
-          <p style="color: #4a4a4a; line-height: 1.6; margin-bottom: 24px;">
-            Unfortunately, we're unable to accommodate your booking request for
-            ${checkInDate} - ${checkOutDate}.
-          </p>
-
-          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 24px;">
-            <h2 style="color: #1a1a1a; font-size: 18px; margin: 0 0 16px 0;">Refund Information</h2>
-            <p style="margin: 8px 0; color: #4a4a4a;">
-              A full refund of <strong>$${booking.total_amount.toFixed(2)}</strong> has been issued to your original payment method.
-            </p>
-            <p style="margin: 8px 0; color: #4a4a4a; font-size: 14px;">
-              Please allow 5-10 business days for the refund to appear on your statement.
-            </p>
+        <div style="font-family: 'DM Sans', system-ui, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #faf9f7;">
+          <div style="margin-bottom: 32px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0 0 8px 0;">Update</p>
+            <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #1c1917; margin: 0; letter-spacing: -0.01em;">Hi ${guestName},</h1>
           </div>
 
-          <p style="color: #4a4a4a; line-height: 1.6;">
-            We apologize for any inconvenience. Feel free to book again for different dates
-            if you're still planning a trip to San Francisco.
+          <p style="color: #78716c; font-size: 15px; line-height: 1.65; margin: 0 0 28px 0;">
+            Unfortunately, we're unable to accommodate your booking for ${checkInDate} through ${checkOutDate}. Your card was never charged — the authorization hold has been released.
           </p>
 
-          <p style="color: #888; font-size: 12px; margin-top: 32px;">
-            Studio Zero SF<br>
-            San Francisco, CA
+          <p style="color: #78716c; font-size: 15px; line-height: 1.65; margin: 0 0 28px 0;">
+            We'd love to host you another time. Feel free to check availability for different dates.
           </p>
+
+          <div style="text-align: center; margin-bottom: 32px;">
+            <a href="https://studiozerosf.com/book" style="display: inline-block; background: #1c1917; color: #faf9f7; padding: 14px 32px; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.02em;">
+              Check Availability
+            </a>
+          </div>
+
+          <div style="border-top: 1px solid #e2dfd9; margin-top: 32px; padding-top: 20px;">
+            <p style="font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #78716c; margin: 0;">Studio Zero SF</p>
+            <p style="font-family: monospace; font-size: 10px; color: #78716c; margin: 4px 0 0 0; letter-spacing: 0.1em;">San Francisco, CA</p>
+          </div>
         </div>
       `,
     });
