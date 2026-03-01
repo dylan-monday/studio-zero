@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
@@ -12,7 +12,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
@@ -179,8 +179,8 @@ async function sendGuestConfirmationEmail(params: GuestConfirmationParams) {
   });
 
   try {
-    await resend.emails.send({
-      from: 'Studio Zero SF <bookings@studiozerosf.com>',
+    await sgMail.send({
+      from: { email: 'bookings@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
       subject: 'Your Booking is Confirmed! - Studio Zero SF',
       html: `
@@ -260,8 +260,8 @@ async function sendGuestDeclineEmail(params: GuestDeclineParams) {
   });
 
   try {
-    await resend.emails.send({
-      from: 'Studio Zero SF <bookings@studiozerosf.com>',
+    await sgMail.send({
+      from: { email: 'bookings@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
       subject: 'Booking Update - Studio Zero SF',
       html: `

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
 import crypto from 'crypto';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -13,7 +13,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY! // Use service role for admin operations
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 // Disable body parsing - Stripe needs raw body for signature verification
 export const config = {
@@ -225,8 +225,8 @@ async function sendOwnerApprovalEmail(params: OwnerEmailParams) {
   });
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'Studio Zero SF <bookings@studiozerosf.com>',
+    await sgMail.send({
+      from: { email: 'bookings@studiozerosf.com', name: 'Studio Zero SF' },
       to: ownerEmail,
       subject: `New Booking Request - ${guestName}`,
       html: `
@@ -266,12 +266,6 @@ async function sendOwnerApprovalEmail(params: OwnerEmailParams) {
         </div>
       `,
     });
-
-    if (error) {
-      console.error('Failed to send owner email:', error);
-    }
-
-    return data;
   } catch (err) {
     console.error('Error sending owner email:', err);
   }
@@ -307,8 +301,8 @@ async function sendGuestPendingEmail(params: GuestEmailParams) {
   });
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'Studio Zero SF <bookings@studiozerosf.com>',
+    await sgMail.send({
+      from: { email: 'bookings@studiozerosf.com', name: 'Studio Zero SF' },
       to: guestEmail,
       subject: 'Your Booking Request - Studio Zero SF',
       html: `
@@ -339,12 +333,6 @@ async function sendGuestPendingEmail(params: GuestEmailParams) {
         </div>
       `,
     });
-
-    if (error) {
-      console.error('Failed to send guest email:', error);
-    }
-
-    return data;
   } catch (err) {
     console.error('Error sending guest email:', err);
   }
