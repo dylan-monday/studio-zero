@@ -24,7 +24,7 @@ export function Home() {
           <img
             src={HERO_IMAGE}
             alt="San Francisco skyline view from Dolores Park"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/80" />
         </div>
