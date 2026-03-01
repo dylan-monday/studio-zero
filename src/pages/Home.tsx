@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button';
 import { PhotoGallery } from '../components/gallery/PhotoGallery';
 import { AvailabilityCalendar } from '../components/booking/AvailabilityCalendar';
 
-const HERO_IMAGE = '/photos/bed.jpg';
+const HERO_IMAGE = '/photos/sf-skyline.jpg';
 
 const GALLERY_PHOTOS = [
   { id: 'bed', url: '/photos/bed.jpg', alt_text: 'Comfortable queen bed', is_hero: true },
@@ -23,10 +23,10 @@ export function Home() {
         <div className="absolute inset-0">
           <img
             src={HERO_IMAGE}
-            alt="Studio Zero SF interior"
+            alt="San Francisco skyline view from Dolores Park"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/80" />
         </div>
         <Container className="relative h-full flex flex-col justify-end pb-16">
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/70 mb-4">
