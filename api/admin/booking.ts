@@ -2,7 +2,22 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import sgMail from '@sendgrid/mail';
-import { requireAdmin } from '../_lib/admin-auth';
+import { createHmac, timingSafeEqual } from 'crypto';
+
+function requireAdmin(req: VercelRequest, res: VercelResponse): boolean {
+  const auth = req.headers.authorization;
+  const token = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined;
+  if (!token) { res.status(401).json({ error: 'Unauthorized' }); return false; }
+  const email = (process.env.ADMIN_EMAIL || '').toLowerCase();
+  const password = process.env.ADMIN_PASSWORD || '';
+  const expected = createHmac('sha256', password).update(email).digest('hex');
+  try {
+    if (!timingSafeEqual(Buffer.from(token), Buffer.from(expected))) {
+      res.status(401).json({ error: 'Unauthorized' }); return false;
+    }
+  } catch { res.status(401).json({ error: 'Unauthorized' }); return false; }
+  return true;
+}
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',

@@ -1,5 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { generateAdminToken } from '../_lib/admin-auth';
+import { createHmac } from 'crypto';
+
+function generateAdminToken(): string {
+  const email = (process.env.ADMIN_EMAIL || '').toLowerCase();
+  const password = process.env.ADMIN_PASSWORD || '';
+  return createHmac('sha256', password).update(email).digest('hex');
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
