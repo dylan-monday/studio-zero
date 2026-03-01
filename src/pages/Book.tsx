@@ -301,7 +301,10 @@ export function Book() {
         <Container size="md">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-semibold text-text-primary mb-2">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
+              Reservations
+            </p>
+            <h1 className="font-serif text-3xl md:text-4xl text-text-primary mb-2 tracking-tight">
               Book Your Stay
             </h1>
             <p className="text-text-secondary">
@@ -328,12 +331,12 @@ export function Book() {
                     else if (s === 'review' && checkIn && checkOut && validateForm()) setStep('review');
                   }}
                   className={`
-                    w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
+                    w-8 h-8 rounded-full flex items-center justify-center text-sm font-mono
                     transition-colors
                     ${step === s
-                      ? 'bg-accent text-white'
+                      ? 'bg-text-primary text-background'
                       : i < ['dates', 'details', 'review'].indexOf(step)
-                      ? 'bg-accent/20 text-accent'
+                      ? 'bg-text-primary/20 text-text-primary'
                       : 'bg-surface text-text-secondary'
                     }
                   `}
@@ -342,7 +345,7 @@ export function Book() {
                 </button>
                 {i < 2 && (
                   <div className={`w-12 h-0.5 mx-2 ${
-                    i < ['dates', 'details', 'review'].indexOf(step) ? 'bg-accent' : 'bg-border'
+                    i < ['dates', 'details', 'review'].indexOf(step) ? 'bg-text-primary' : 'bg-border'
                   }`} />
                 )}
               </div>
@@ -356,8 +359,8 @@ export function Book() {
               {step === 'dates' && (
                 <>
                   {/* Date Picker */}
-                  <div className="bg-white rounded-xl border border-border p-6">
-                    <h2 className="text-xl font-semibold text-text-primary mb-4">
+                  <div className="bg-background border border-border p-6">
+                    <h2 className="font-serif text-xl text-text-primary mb-4 tracking-tight">
                       Select Your Dates
                     </h2>
                     <p className="text-sm text-text-secondary mb-4">
@@ -395,8 +398,8 @@ export function Book() {
                   </div>
 
                   {/* Guest Count */}
-                  <div className="bg-white rounded-xl border border-border p-6">
-                    <h2 className="text-xl font-semibold text-text-primary mb-4">
+                  <div className="bg-background border border-border p-6">
+                    <h2 className="font-serif text-xl text-text-primary tracking-tight mb-4">
                       Number of Guests
                     </h2>
                     <div className="flex items-center gap-4">
@@ -426,8 +429,8 @@ export function Book() {
                   </div>
 
                   {/* Coupon Code */}
-                  <div className="bg-white rounded-xl border border-border p-6">
-                    <h2 className="text-xl font-semibold text-text-primary mb-4">
+                  <div className="bg-background border border-border p-6">
+                    <h2 className="font-serif text-xl text-text-primary tracking-tight mb-4">
                       Have a Coupon?
                     </h2>
                     {coupon ? (
@@ -458,8 +461,8 @@ export function Book() {
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                           placeholder="Enter coupon code"
-                          className="flex-1 px-4 py-2 rounded-lg border border-border
-                            focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent
+                          className="flex-1 px-4 py-2 border border-border
+                            focus:outline-none focus:ring-2 focus:ring-text-primary/10 focus:border-text-primary
                             text-text-primary placeholder:text-text-secondary"
                         />
                         <Button
@@ -492,13 +495,13 @@ export function Book() {
               {/* Step 2: Guest Details */}
               {step === 'details' && (
                 <>
-                  <div className="bg-white rounded-xl border border-border p-6">
-                    <h2 className="text-xl font-semibold text-text-primary mb-6">
+                  <div className="bg-background border border-border p-6">
+                    <h2 className="font-serif text-xl text-text-primary tracking-tight mb-6">
                       Guest Information
                     </h2>
 
                     {existingGuest && (
-                      <div className="mb-6 p-3 bg-accent/10 rounded-lg text-sm text-accent">
+                      <div className="mb-6 p-3 bg-text-primary/5 border border-text-primary/10 text-sm text-text-primary">
                         Welcome back! We've filled in your details.
                       </div>
                     )}
@@ -595,8 +598,8 @@ export function Book() {
                           value={guestForm.notes}
                           onChange={(e) => setGuestForm({ ...guestForm, notes: e.target.value })}
                           rows={3}
-                          className="w-full px-4 py-2 rounded-lg border border-border
-                            focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent
+                          className="w-full px-4 py-2 border border-border
+                            focus:outline-none focus:ring-2 focus:ring-text-primary/10 focus:border-text-primary
                             resize-none"
                           placeholder="Any special requests or questions?"
                         />
@@ -628,8 +631,8 @@ export function Book() {
               {/* Step 3: Review */}
               {step === 'review' && (
                 <>
-                  <div className="bg-white rounded-xl border border-border p-6">
-                    <h2 className="text-xl font-semibold text-text-primary mb-6">
+                  <div className="bg-background border border-border p-6">
+                    <h2 className="font-serif text-xl text-text-primary tracking-tight mb-6">
                       Review Your Booking
                     </h2>
 
@@ -699,8 +702,8 @@ export function Book() {
 
             {/* Sidebar - Price Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl border border-border p-6 sticky top-24">
-                <h3 className="text-lg font-semibold text-text-primary mb-4">
+              <div className="bg-background border border-border p-6 sticky top-24">
+                <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-4">
                   Price Summary
                 </h3>
 

@@ -12,19 +12,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-accent text-white hover:bg-accent-hover active:bg-accent-hover',
+    'bg-text-primary text-background hover:bg-accent-hover active:bg-accent-hover',
   secondary:
     'bg-surface text-text-primary border border-border hover:bg-border/50',
   outline:
-    'bg-transparent text-accent border border-accent hover:bg-accent/10',
+    'bg-transparent text-text-primary border border-text-primary hover:bg-text-primary hover:text-background',
   ghost:
     'bg-transparent text-text-primary hover:bg-surface',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-6 py-3 text-lg',
+  sm: 'px-4 py-1.5 text-sm',
+  md: 'px-5 py-2.5 text-sm',
+  lg: 'px-8 py-3.5 text-base',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -46,9 +46,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || isLoading}
         className={`
           inline-flex items-center justify-center
-          font-medium rounded-lg
-          transition-colors duration-150
-          disabled:opacity-50 disabled:cursor-not-allowed
+          font-medium tracking-wide
+          transition-all duration-200
+          disabled:opacity-40 disabled:cursor-not-allowed
           ${variantStyles[variant]}
           ${sizeStyles[size]}
           ${className}

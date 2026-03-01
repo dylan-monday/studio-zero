@@ -18,7 +18,7 @@ interface AvailabilityCalendarProps {
   showLegend?: boolean;
 }
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 export function AvailabilityCalendar({
   onDateSelect,
@@ -68,24 +68,24 @@ export function AvailabilityCalendar({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-border p-4 sm:p-6">
+    <div className="bg-background border border-border p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={handlePrevMonth}
-          className="p-2 hover:bg-surface rounded-lg transition-colors"
+          className="p-2 hover:bg-surface transition-colors"
           aria-label="Previous month"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2 className="text-lg font-semibold text-text-primary">
+        <h2 className="font-serif text-lg text-text-primary tracking-tight">
           {format(currentMonth, 'MMMM yyyy')}
         </h2>
         <button
           onClick={handleNextMonth}
-          className="p-2 hover:bg-surface rounded-lg transition-colors"
+          className="p-2 hover:bg-surface transition-colors"
           aria-label="Next month"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,7 +99,7 @@ export function AvailabilityCalendar({
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="text-center text-xs font-medium text-text-secondary py-2"
+            className="text-center text-xs font-mono uppercase tracking-wider text-text-secondary py-2"
           >
             {day}
           </div>
@@ -127,12 +127,12 @@ export function AvailabilityCalendar({
               disabled={status !== 'available' || loading}
               className={`
                 aspect-square flex items-center justify-center
-                text-sm rounded-lg transition-all duration-150
+                text-sm transition-all duration-150
                 ${today ? 'font-bold' : 'font-normal'}
                 ${selected
-                  ? 'bg-accent text-white'
+                  ? 'bg-text-primary text-background'
                   : inRange
-                  ? 'bg-accent/10 text-accent'
+                  ? 'bg-text-primary/10 text-text-primary'
                   : status === 'available'
                   ? 'hover:bg-surface text-text-primary cursor-pointer'
                   : status === 'past'
@@ -155,15 +155,15 @@ export function AvailabilityCalendar({
       {showLegend && (
         <div className="mt-6 pt-4 border-t border-border flex flex-wrap gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-white border border-border" />
+            <div className="w-3 h-3 bg-background border border-border" />
             <span className="text-text-secondary">Available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-surface" />
+            <div className="w-3 h-3 bg-surface" />
             <span className="text-text-secondary line-through">Booked</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-accent" />
+            <div className="w-3 h-3 bg-text-primary" />
             <span className="text-text-secondary">Selected</span>
           </div>
         </div>
@@ -171,8 +171,8 @@ export function AvailabilityCalendar({
 
       {/* Loading state */}
       {loading && (
-        <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-xl">
-          <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-text-primary border-t-transparent rounded-full animate-spin" />
         </div>
       )}
     </div>

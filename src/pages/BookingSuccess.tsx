@@ -43,11 +43,11 @@ export function BookingSuccess() {
 
   return (
     <Layout>
-      <div className="py-12 md:py-20">
+      <div className="py-16 md:py-24">
         <Container size="sm">
           <div className="text-center">
             {/* Success Icon */}
-            <div className="mx-auto w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-6">
+            <div className="mx-auto w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-8">
               <svg
                 className="w-8 h-8 text-success"
                 fill="none"
@@ -63,24 +63,27 @@ export function BookingSuccess() {
               </svg>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-semibold text-text-primary mb-4">
-              Booking Request Received!
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
+              Confirmed
+            </p>
+            <h1 className="font-serif text-3xl md:text-4xl text-text-primary mb-4 tracking-tight">
+              Booking Request Received
             </h1>
 
-            <p className="text-lg text-text-secondary mb-8 max-w-md mx-auto">
+            <p className="text-lg text-text-secondary mb-10 max-w-md mx-auto leading-relaxed">
               Thank you for your booking request. Your payment has been processed
               and the host will review your request shortly.
             </p>
 
             {/* Booking Details Card */}
             {loading ? (
-              <div className="bg-white rounded-xl border border-border p-6 mb-8 animate-pulse">
-                <div className="h-4 bg-surface rounded w-3/4 mx-auto mb-4" />
-                <div className="h-4 bg-surface rounded w-1/2 mx-auto" />
+              <div className="border border-border p-6 mb-8 animate-pulse">
+                <div className="h-4 bg-surface w-3/4 mx-auto mb-4" />
+                <div className="h-4 bg-surface w-1/2 mx-auto" />
               </div>
             ) : booking ? (
-              <div className="bg-white rounded-xl border border-border p-6 mb-8 text-left">
-                <h2 className="text-lg font-semibold text-text-primary mb-4 text-center">
+              <div className="border border-border p-6 mb-8 text-left">
+                <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-4 text-center">
                   Your Booking
                 </h2>
                 <div className="space-y-3">
@@ -98,12 +101,12 @@ export function BookingSuccess() {
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-text-secondary">Total paid</span>
-                    <span className="font-semibold text-lg">${booking.total.toFixed(2)}</span>
+                    <span className="font-serif text-xl">${booking.total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl border border-border p-6 mb-8">
+              <div className="border border-border p-6 mb-8">
                 <p className="text-text-secondary">
                   A confirmation email has been sent to your email address.
                 </p>
@@ -111,23 +114,23 @@ export function BookingSuccess() {
             )}
 
             {/* What's Next */}
-            <div className="bg-surface rounded-xl p-6 mb-8 text-left">
-              <h2 className="text-lg font-semibold text-text-primary mb-4">What happens next?</h2>
-              <ol className="space-y-3 text-text-secondary">
+            <div className="bg-surface p-6 mb-10 text-left">
+              <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-4">What happens next?</h2>
+              <ol className="space-y-4 text-text-secondary">
                 <li className="flex gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-accent/10 text-accent rounded-full flex items-center justify-center text-sm font-medium">
+                  <span className="flex-shrink-0 w-6 h-6 bg-text-primary/10 text-text-primary rounded-full flex items-center justify-center text-xs font-mono">
                     1
                   </span>
                   <span>The host will review your booking request (usually within a few hours)</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-accent/10 text-accent rounded-full flex items-center justify-center text-sm font-medium">
+                  <span className="flex-shrink-0 w-6 h-6 bg-text-primary/10 text-text-primary rounded-full flex items-center justify-center text-xs font-mono">
                     2
                   </span>
                   <span>You'll receive a confirmation email once approved</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-accent/10 text-accent rounded-full flex items-center justify-center text-sm font-medium">
+                  <span className="flex-shrink-0 w-6 h-6 bg-text-primary/10 text-text-primary rounded-full flex items-center justify-center text-xs font-mono">
                     3
                   </span>
                   <span>Check-in instructions will be sent 24 hours before your stay</span>

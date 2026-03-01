@@ -19,25 +19,28 @@ export function Home() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative h-[70vh] min-h-[500px]">
+      <section className="relative h-[75vh] min-h-[560px]">
         <div className="absolute inset-0">
           <img
             src={HERO_IMAGE}
             alt="Studio Zero SF interior"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/50" />
         </div>
-        <Container className="relative h-full flex flex-col justify-end pb-12">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4">
-            Studio Zero SF
+        <Container className="relative h-full flex flex-col justify-end pb-16">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/70 mb-4">
+            San Francisco
+          </p>
+          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-white mb-4 tracking-tight">
+            Studio Zero
           </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-xl mb-8">
-            A beautifully designed studio apartment in the heart of San Francisco.
-            Your perfect home base for exploring the city.
+          <p className="text-lg text-white/80 max-w-md mb-10 leading-relaxed">
+            A thoughtfully designed studio in the heart of the city.
+            Your home base for exploring San Francisco.
           </p>
           <Link to="/book">
-            <Button size="lg" className="w-full sm:w-auto">
+            <Button size="lg" className="w-full sm:w-auto bg-white text-text-primary hover:bg-white/90">
               Check Availability
             </Button>
           </Link>
@@ -45,33 +48,36 @@ export function Home() {
       </section>
 
       {/* Quick Info Bar */}
-      <section className="bg-surface border-y border-border py-6">
+      <section className="border-b border-border py-8">
         <Container>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <p className="text-2xl font-semibold text-text-primary">2</p>
-              <p className="text-sm text-text-secondary">Guests</p>
+              <p className="font-serif text-3xl text-text-primary">2</p>
+              <p className="text-xs font-mono uppercase tracking-widest text-text-secondary mt-1">Guests</p>
             </div>
             <div>
-              <p className="text-2xl font-semibold text-text-primary">1</p>
-              <p className="text-sm text-text-secondary">Bedroom</p>
+              <p className="font-serif text-3xl text-text-primary">1</p>
+              <p className="text-xs font-mono uppercase tracking-widest text-text-secondary mt-1">Bedroom</p>
             </div>
             <div>
-              <p className="text-2xl font-semibold text-text-primary">1</p>
-              <p className="text-sm text-text-secondary">Bathroom</p>
+              <p className="font-serif text-3xl text-text-primary">1</p>
+              <p className="text-xs font-mono uppercase tracking-widest text-text-secondary mt-1">Bathroom</p>
             </div>
             <div>
-              <p className="text-2xl font-semibold text-text-primary">2+</p>
-              <p className="text-sm text-text-secondary">Night Minimum</p>
+              <p className="font-serif text-3xl text-text-primary">2+</p>
+              <p className="text-xs font-mono uppercase tracking-widest text-text-secondary mt-1">Night Min</p>
             </div>
           </div>
         </Container>
       </section>
 
       {/* Photo Gallery */}
-      <section className="py-12 md:py-16">
+      <section className="py-16 md:py-24">
         <Container>
-          <h2 className="text-2xl md:text-3xl font-semibold text-text-primary mb-8">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
+            Gallery
+          </p>
+          <h2 className="font-serif text-3xl md:text-4xl text-text-primary mb-10 tracking-tight">
             The Space
           </h2>
           <PhotoGallery staticPhotos={GALLERY_PHOTOS} />
@@ -79,37 +85,42 @@ export function Home() {
       </section>
 
       {/* Property Description */}
-      <section className="py-12 md:py-16 bg-surface">
+      <section className="py-16 md:py-24 bg-surface">
         <Container>
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-16">
             <div>
-              <h2 className="text-2xl md:text-3xl font-semibold text-text-primary mb-6">
-                About This Place
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
+                About
+              </p>
+              <h2 className="font-serif text-3xl md:text-4xl text-text-primary mb-8 tracking-tight">
+                Your Stay
               </h2>
-              <div className="prose prose-gray max-w-none">
-                <p className="text-text-secondary leading-relaxed mb-4">
-                  Welcome to Studio Zero SF, a thoughtfully designed studio apartment
+              <div className="space-y-5">
+                <p className="text-text-secondary leading-relaxed">
+                  Welcome to Studio Zero, a thoughtfully designed studio apartment
                   that combines modern comfort with San Francisco charm. Whether you're
                   visiting for business or pleasure, this space offers everything you
                   need for a memorable stay.
                 </p>
-                <p className="text-text-secondary leading-relaxed mb-4">
+                <p className="text-text-secondary leading-relaxed">
                   The studio features a comfortable queen bed, a fully equipped kitchen,
                   a dedicated workspace, and a cozy living area. Natural light fills
-                  the space throughout the day, creating an inviting atmosphere.
+                  the space throughout the day.
                 </p>
                 <p className="text-text-secondary leading-relaxed">
                   Enjoy modern amenities including high-speed WiFi, smart TV with
-                  streaming services, in-unit washer/dryer, and climate control for
-                  your comfort.
+                  streaming services, in-unit washer/dryer, and climate control.
                 </p>
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-text-primary mb-4">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
+                Included
+              </p>
+              <h3 className="font-serif text-2xl text-text-primary mb-6 tracking-tight">
                 Amenities
               </h3>
-              <ul className="grid grid-cols-2 gap-3">
+              <ul className="grid grid-cols-2 gap-4">
                 {[
                   'High-speed WiFi',
                   'Smart TV',
@@ -122,10 +133,8 @@ export function Home() {
                   'Hair dryer',
                   'Iron',
                 ].map((amenity) => (
-                  <li key={amenity} className="flex items-center gap-2 text-text-secondary">
-                    <svg className="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                  <li key={amenity} className="flex items-center gap-3 text-text-secondary">
+                    <span className="w-1 h-1 bg-text-primary rounded-full flex-shrink-0" />
                     {amenity}
                   </li>
                 ))}
@@ -136,46 +145,49 @@ export function Home() {
       </section>
 
       {/* House Rules Summary */}
-      <section className="py-12 md:py-16">
+      <section className="py-16 md:py-24">
         <Container>
-          <h2 className="text-2xl md:text-3xl font-semibold text-text-primary mb-8">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
+            Please Note
+          </p>
+          <h2 className="font-serif text-3xl md:text-4xl text-text-primary mb-10 tracking-tight">
             House Rules
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: '🕐', title: 'Check-in: 3:00 PM', subtitle: 'Check-out: 11:00 AM' },
-              { icon: '👥', title: 'Maximum 2 guests', subtitle: 'Perfect for couples or solo travelers' },
-              { icon: '🚭', title: 'No smoking', subtitle: 'Inside or on balcony' },
-              { icon: '🐾', title: 'No pets', subtitle: 'Sorry, allergies!' },
-              { icon: '🎉', title: 'No parties', subtitle: 'Respect the neighbors' },
-              { icon: '🔇', title: 'Quiet hours', subtitle: '10 PM - 8 AM' },
+              { title: 'Check-in: 3:00 PM', subtitle: 'Check-out: 11:00 AM' },
+              { title: 'Maximum 2 guests', subtitle: 'Perfect for couples or solo travelers' },
+              { title: 'No smoking', subtitle: 'Inside or on balcony' },
+              { title: 'No pets', subtitle: 'Sorry, allergies!' },
+              { title: 'No parties', subtitle: 'Respect the neighbors' },
+              { title: 'Quiet hours', subtitle: '10 PM \u2013 8 AM' },
             ].map((rule) => (
-              <div key={rule.title} className="flex items-start gap-4 p-4 bg-surface rounded-xl">
-                <span className="text-2xl">{rule.icon}</span>
-                <div>
-                  <p className="font-medium text-text-primary">{rule.title}</p>
-                  <p className="text-sm text-text-secondary">{rule.subtitle}</p>
-                </div>
+              <div key={rule.title} className="p-5 border border-border">
+                <p className="font-medium text-text-primary mb-1">{rule.title}</p>
+                <p className="text-sm text-text-secondary">{rule.subtitle}</p>
               </div>
             ))}
           </div>
-          <div className="mt-6 text-center">
-            <Link to="/house-rules" className="text-accent hover:text-accent-hover font-medium">
-              View all house rules →
+          <div className="mt-8">
+            <Link to="/house-rules" className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary hover:text-text-primary transition-colors">
+              View all house rules &rarr;
             </Link>
           </div>
         </Container>
       </section>
 
       {/* Neighborhood */}
-      <section className="py-12 md:py-16 bg-surface">
+      <section className="py-16 md:py-24 bg-surface">
         <Container>
-          <h2 className="text-2xl md:text-3xl font-semibold text-text-primary mb-6">
-            The Neighborhood
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="text-text-secondary leading-relaxed mb-4">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
+                Location
+              </p>
+              <h2 className="font-serif text-3xl md:text-4xl text-text-primary mb-6 tracking-tight">
+                The Neighborhood
+              </h2>
+              <p className="text-text-secondary leading-relaxed mb-6">
                 Located in a vibrant San Francisco neighborhood with easy access to
                 public transit, restaurants, and local attractions. Walk to nearby
                 parks, cafes, and shops within minutes.
@@ -187,17 +199,14 @@ export function Home() {
                   'Grocery stores within walking distance',
                   'Close to popular attractions',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-text-secondary">
-                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                  <li key={item} className="flex items-center gap-3 text-text-secondary">
+                    <span className="w-1 h-1 bg-text-primary rounded-full flex-shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-xl overflow-hidden aspect-video">
+            <div className="overflow-hidden aspect-[4/3]">
               <img
                 src="/photos/neighborhood.png"
                 alt="San Francisco neighborhood"
@@ -209,17 +218,20 @@ export function Home() {
       </section>
 
       {/* Availability Calendar */}
-      <section className="py-12 md:py-16">
+      <section className="py-16 md:py-24">
         <Container>
           <div className="max-w-xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-semibold text-text-primary mb-2 text-center">
-              Check Availability
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3 text-center">
+              Availability
+            </p>
+            <h2 className="font-serif text-3xl md:text-4xl text-text-primary mb-2 text-center tracking-tight">
+              Plan Your Stay
             </h2>
-            <p className="text-text-secondary text-center mb-8">
-              Select your dates to see pricing and book your stay
+            <p className="text-text-secondary text-center mb-10">
+              Select your dates to see pricing
             </p>
             <AvailabilityCalendar />
-            <div className="mt-8 text-center">
+            <div className="mt-10 text-center">
               <Link to="/book">
                 <Button size="lg" className="w-full sm:w-auto">
                   Book Your Stay
@@ -231,14 +243,16 @@ export function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-text-primary text-white">
+      <section className="py-20 md:py-32 bg-text-primary text-white">
         <Container className="text-center">
-          <h2 className="text-3xl md:text-4xl font-semibold mb-4">
-            Ready to book your stay?
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/50 mb-4">
+            Direct Booking
+          </p>
+          <h2 className="font-serif text-4xl md:text-5xl mb-6 tracking-tight">
+            Ready to visit?
           </h2>
-          <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">
-            Experience San Francisco like a local. Book directly for the best rates
-            and personalized service.
+          <p className="text-white/70 text-lg mb-10 max-w-md mx-auto leading-relaxed">
+            Experience San Francisco like a local. Book directly for the best rates.
           </p>
           <Link to="/book">
             <Button size="lg" className="bg-white text-text-primary hover:bg-white/90">
