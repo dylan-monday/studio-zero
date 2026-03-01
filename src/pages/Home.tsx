@@ -33,7 +33,7 @@ export function Home() {
             alt="San Francisco skyline view from Dolores Park"
             className="w-full h-full object-cover object-top"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/75" />
         </div>
         <Container className="relative h-full flex flex-col justify-end pb-16">
           <div className="max-w-lg">
