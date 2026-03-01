@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
-import { supabase } from '../lib/supabase';
 import { format, parseISO } from 'date-fns';
 import type { Booking, BookingStatus } from '../types';
 
@@ -30,18 +29,13 @@ export function Admin() {
 
   useEffect(() => {
     async function fetchBookings() {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          guest:guests(*)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching bookings:', error);
-      } else {
-        setBookings(data || []);
+      try {
+        const res = await fetch('/api/admin/bookings');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        setBookings(data);
+      } catch (err) {
+        console.error('Error fetching bookings:', err);
       }
       setLoading(false);
     }

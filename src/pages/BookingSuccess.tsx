@@ -64,15 +64,15 @@ export function BookingSuccess() {
             </div>
 
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-secondary mb-3">
-              Confirmed
+              Request Submitted
             </p>
             <h1 className="font-serif text-3xl md:text-4xl text-text-primary mb-4 tracking-tight">
               Booking Request Received
             </h1>
 
             <p className="text-lg text-text-secondary mb-10 max-w-md mx-auto leading-relaxed">
-              Thank you for your booking request. Your payment has been processed
-              and the host will review your request shortly.
+              Thank you for your booking request. Your card has been authorized
+              but won't be charged until the host confirms your stay.
             </p>
 
             {/* Booking Details Card */}
@@ -100,7 +100,7 @@ export function BookingSuccess() {
                     <span className="font-medium">{booking.guestEmail}</span>
                   </div>
                   <div className="flex justify-between py-2">
-                    <span className="text-text-secondary">Total paid</span>
+                    <span className="text-text-secondary">Total</span>
                     <span className="font-serif text-xl">${booking.total.toFixed(2)}</span>
                   </div>
                 </div>
