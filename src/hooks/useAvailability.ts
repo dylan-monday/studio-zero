@@ -33,14 +33,12 @@ export function useAvailability(options: UseAvailabilityOptions = {}) {
 
       if (blockedError) throw blockedError;
 
-      // Fetch confirmed/approved bookings
-      const { data: bookings, error: bookingsError } = await supabase
-        .from('bookings')
-        .select('check_in, check_out')
-        .in('status', ['pending', 'approved', 'confirmed'])
-        .or(`check_in.lte.${format(endDate, 'yyyy-MM-dd')},check_out.gte.${format(startDate, 'yyyy-MM-dd')}`);
-
-      if (bookingsError) throw bookingsError;
+      // Fetch booked dates via API (bypasses RLS on bookings table)
+      const startStr = format(startDate, 'yyyy-MM-dd');
+      const endStr = format(endDate, 'yyyy-MM-dd');
+      const bookingsRes = await fetch(`/api/booked-dates?start=${startStr}&end=${endStr}`);
+      if (!bookingsRes.ok) throw new Error('Failed to fetch booked dates');
+      const bookings: { check_in: string; check_out: string }[] = await bookingsRes.json();
 
       // Build set of unavailable dates
       const blockedSet = new Set(blockedDates?.map((d: { date: string }) => d.date) || []);

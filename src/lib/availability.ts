@@ -17,23 +17,19 @@ export async function getUnavailableDates(
   const startStr = format(startDate, 'yyyy-MM-dd');
   const endStr = format(endDate, 'yyyy-MM-dd');
 
-  // Fetch blocked dates and bookings in parallel
-  const [blockedResponse, bookingsResponse] = await Promise.all([
+  // Fetch blocked dates and booked date ranges in parallel
+  const [blockedResponse, bookingsRes] = await Promise.all([
     supabase
       .from('blocked_dates')
       .select('date, reason')
       .gte('date', startStr)
       .lte('date', endStr),
-    supabase
-      .from('bookings')
-      .select('check_in, check_out')
-      .in('status', ['pending', 'approved', 'confirmed'])
-      .lte('check_in', endStr)
-      .gte('check_out', startStr),
+    fetch(`/api/booked-dates?start=${startStr}&end=${endStr}`),
   ]);
 
   if (blockedResponse.error) throw blockedResponse.error;
-  if (bookingsResponse.error) throw bookingsResponse.error;
+  if (!bookingsRes.ok) throw new Error('Failed to fetch booked dates');
+  const bookingsData: { check_in: string; check_out: string }[] = await bookingsRes.json();
 
   const unavailableDates: UnavailableDate[] = [];
   const dateSet = new Set<string>();
@@ -51,7 +47,7 @@ export async function getUnavailableDates(
   });
 
   // Add booked dates (expand date ranges)
-  bookingsResponse.data?.forEach((booking: { check_in: string; check_out: string }) => {
+  bookingsData.forEach((booking: { check_in: string; check_out: string }) => {
     const checkIn = parseISO(booking.check_in);
     const checkOut = parseISO(booking.check_out);
     // Nights are from check_in to day before check_out
