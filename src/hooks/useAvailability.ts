@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import type { DateAvailability, Booking } from '../types';
-import { startOfMonth, endOfMonth, eachDayOfInterval, format, isBefore, startOfDay } from 'date-fns';
+import { startOfMonth, endOfMonth, eachDayOfInterval, format, isBefore, startOfDay, parseISO } from 'date-fns';
 
 interface UseAvailabilityOptions {
   startDate?: Date;
@@ -45,8 +45,8 @@ export function useAvailability(options: UseAvailabilityOptions = {}) {
       const bookedSet = new Set<string>();
 
       bookings?.forEach((booking: Pick<Booking, 'check_in' | 'check_out'>) => {
-        const checkIn = new Date(booking.check_in);
-        const checkOut = new Date(booking.check_out);
+        const checkIn = parseISO(booking.check_in);
+        const checkOut = parseISO(booking.check_out);
         const nights = eachDayOfInterval({ start: checkIn, end: new Date(checkOut.getTime() - 86400000) });
         nights.forEach(night => bookedSet.add(format(night, 'yyyy-MM-dd')));
       });
