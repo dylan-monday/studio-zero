@@ -11,6 +11,7 @@ import type { AdminAuthContext } from '../components/admin/AdminAuth';
 export function AdminCalendar() {
   const { logout } = useOutletContext<AdminAuthContext>();
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
+  const [bookedDates, setBookedDates] = useState<Set<string>>(new Set());
   const [overrides, setOverrides] = useState<DateOverride[]>([]);
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
@@ -34,14 +35,26 @@ export function AdminCalendar() {
 
   async function fetchAll() {
     try {
-      const [blockedRes, overrideRes, rulesRes] = await Promise.all([
+      const [blockedRes, overrideRes, rulesRes, bookedRes] = await Promise.all([
         adminFetch('/api/admin/calendar?resource=blocked-dates'),
         adminFetch('/api/admin/calendar?resource=date-overrides'),
         adminFetch('/api/admin/calendar?resource=pricing-rules'),
+        fetch('/api/booked-dates?start=' + format(new Date(), 'yyyy-MM-dd') + '&end=' + format(addMonths(new Date(), 12), 'yyyy-MM-dd')),
       ]);
       if (blockedRes.ok) setBlockedDates(await blockedRes.json());
       if (overrideRes.ok) setOverrides(await overrideRes.json());
       if (rulesRes.ok) setPricingRules(await rulesRes.json());
+      if (bookedRes.ok) {
+        const bookings: { check_in: string; check_out: string }[] = await bookedRes.json();
+        const dates = new Set<string>();
+        bookings.forEach(b => {
+          const checkIn = parseISO(b.check_in);
+          const checkOut = parseISO(b.check_out);
+          const nights = eachDayOfInterval({ start: checkIn, end: new Date(checkOut.getTime() - 86400000) });
+          nights.forEach(n => dates.add(format(n, 'yyyy-MM-dd')));
+        });
+        setBookedDates(dates);
+      }
     } catch (err) {
       console.error('Error fetching calendar data:', err);
     }
@@ -213,6 +226,7 @@ export function AdminCalendar() {
                   {days.map(day => {
                     const dateStr = format(day, 'yyyy-MM-dd');
                     const isBlocked = blockedSet.has(dateStr);
+                    const isBooked = bookedDates.has(dateStr);
                     const override = overrideMap.get(dateStr);
                     const isSelected = selectedDates.has(dateStr);
                     const isPast = isBefore(day, today);
@@ -225,22 +239,27 @@ export function AdminCalendar() {
                         className={`relative p-2 text-center text-sm transition-colors border ${
                           isSelected
                             ? 'border-text-primary bg-text-primary/5'
-                            : isBlocked
-                              ? 'border-red-200 bg-red-50'
-                              : override
-                                ? 'border-blue-200 bg-blue-50'
-                                : 'border-transparent hover:bg-surface'
+                            : isBooked
+                              ? 'border-emerald-200 bg-emerald-50'
+                              : isBlocked
+                                ? 'border-red-200 bg-red-50'
+                                : override
+                                  ? 'border-blue-200 bg-blue-50'
+                                  : 'border-transparent hover:bg-surface'
                         } ${isPast ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'} ${
                           isToday(day) ? 'font-bold' : ''
                         }`}
                       >
-                        <span className={`block ${isBlocked ? 'text-red-600' : 'text-text-primary'}`}>
+                        <span className={`block ${isBooked ? 'text-emerald-700' : isBlocked ? 'text-red-600' : 'text-text-primary'}`}>
                           {format(day, 'd')}
                         </span>
                         {override && (
                           <span className="block text-[10px] text-blue-600 font-mono">${override.nightly_rate}</span>
                         )}
-                        {isBlocked && (
+                        {isBooked && (
+                          <span className="block text-[9px] text-emerald-600 font-mono">booked</span>
+                        )}
+                        {isBlocked && !isBooked && (
                           <span className="block text-[9px] text-red-500 font-mono">blocked</span>
                         )}
                       </button>
@@ -250,6 +269,10 @@ export function AdminCalendar() {
 
                 {/* Legend */}
                 <div className="flex gap-4 mt-4 pt-4 border-t border-border">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 bg-emerald-50 border border-emerald-200" />
+                    <span className="text-xs text-text-secondary">Booked</span>
+                  </div>
                   <div className="flex items-center gap-1.5">
                     <div className="w-3 h-3 bg-red-50 border border-red-200" />
                     <span className="text-xs text-text-secondary">Blocked</span>
