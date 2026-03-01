@@ -57,7 +57,7 @@ export function Home() {
             </div>
             <div>
               <p className="font-serif text-3xl text-text-primary">1</p>
-              <p className="text-xs font-mono uppercase tracking-widest text-text-secondary mt-1">Bedroom</p>
+              <p className="text-xs font-mono uppercase tracking-widest text-text-secondary mt-1">Studio</p>
             </div>
             <div>
               <p className="font-serif text-3xl text-text-primary">1</p>
@@ -97,19 +97,18 @@ export function Home() {
               </h2>
               <div className="space-y-5">
                 <p className="text-text-secondary leading-relaxed">
-                  Welcome to Studio Zero, a thoughtfully designed studio apartment
-                  that combines modern comfort with San Francisco charm. Whether you're
-                  visiting for business or pleasure, this space offers everything you
-                  need for a memorable stay.
+                  Welcome to Studio Zero — a clean, comfortable private studio in a
+                  residential building in one of San Francisco's best neighborhoods.
+                  Think boutique hotel room, not apartment.
                 </p>
                 <p className="text-text-secondary leading-relaxed">
-                  The studio features a comfortable queen bed, a fully equipped kitchen,
-                  a dedicated workspace, and a cozy living area. Natural light fills
-                  the space throughout the day.
+                  The studio features a comfortable queen bed, a dedicated workspace,
+                  a great shower, and a small fridge. No kitchen — but you're in one of
+                  the best neighborhoods for coffee and food in the world.
                 </p>
                 <p className="text-text-secondary leading-relaxed">
-                  Enjoy modern amenities including high-speed WiFi, smart TV with
-                  streaming services, in-unit washer/dryer, and climate control.
+                  High-speed WiFi, smart TV with streaming, washer/dryer in the
+                  building, and a shared back garden round out the experience.
                 </p>
               </div>
             </div>
@@ -124,14 +123,14 @@ export function Home() {
                 {[
                   'High-speed WiFi',
                   'Smart TV',
-                  'Full kitchen',
+                  'Small fridge',
                   'Washer/Dryer',
-                  'Air conditioning',
                   'Heating',
                   'Workspace',
-                  'Coffee maker',
-                  'Hair dryer',
-                  'Iron',
+                  'Great shower',
+                  'Closet',
+                  'Back garden',
+                  'Toiletries',
                 ].map((amenity) => (
                   <li key={amenity} className="flex items-center gap-3 text-text-secondary">
                     <span className="w-1 h-1 bg-text-primary rounded-full flex-shrink-0" />
@@ -156,11 +155,11 @@ export function Home() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { title: 'Check-in: 3:00 PM', subtitle: 'Check-out: 11:00 AM' },
-              { title: 'Maximum 2 guests', subtitle: 'Perfect for couples or solo travelers' },
-              { title: 'No smoking', subtitle: 'Inside or on balcony' },
-              { title: 'No pets', subtitle: 'Sorry, allergies!' },
-              { title: 'No parties', subtitle: 'Respect the neighbors' },
-              { title: 'Quiet hours', subtitle: '10 PM \u2013 8 AM' },
+              { title: 'Maximum 2 guests', subtitle: 'No guests of guests' },
+              { title: 'No smoking', subtitle: 'Inside the studio' },
+              { title: 'No pets', subtitle: 'No exceptions' },
+              { title: 'Residential building', subtitle: 'Be respectful of neighbors' },
+              { title: 'Lock up', subtitle: '$150 fee for lost keys' },
             ].map((rule) => (
               <div key={rule.title} className="p-5 border border-border">
                 <p className="font-medium text-text-primary mb-1">{rule.title}</p>
